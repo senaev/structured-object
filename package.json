@@ -1,0 +1,27 @@
+{
+  "name": "structured-object",
+  "version": "1.0.0",
+  "description": "Make object with freezed structure and dynamic property names and values",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/senaev/structured-object.git"
+  },
+  "keywords": [
+    "structured",
+    "object",
+    "dynamic",
+    "properties",
+    "freezed",
+    "data"
+  ],
+  "author": "Andrey Senaev <gsacryfice@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/senaev/structured-object/issues"
+  },
+  "homepage": "https://github.com/senaev/structured-object#readme"
+}

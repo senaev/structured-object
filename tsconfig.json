@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "outFile": "./_out/ts.js",
+    "target": "es3",
+    "noImplicitAny": true,
+    "noFallthroughCasesInSwitch": true,
+    "strictNullChecks": true,
+    "noImplicitThis": true,
+    "noUnusedParameters": false,
+    "noUnusedLocals": true,
+    "noImplicitReturns": true,
+    "pretty": true,
+    "moduleResolution": "node",
+    "types": [
+      "mocha",
+      "chai"
+    ]
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}
