@@ -77,6 +77,7 @@ export default class StructuredObject {
     }
 
     public toJSON(): Structured {
+        return {};
     }
 }
 
