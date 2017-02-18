@@ -1,7 +1,3 @@
-type Structured = {
-    [propertyName: string]: Structured | null;
-};
-
 type OneField = {
     fieldName: string;
     isDataField: boolean;
@@ -12,8 +8,12 @@ type OneField = {
 
 const undefined = void 0;
 
-export default class StructuredObject {
-    private readonly fields: OneField[];
+export type Structured = {
+    [propertyName: string]: Structured | null;
+};
+
+export class StructuredObject {
+    private readonly fields: OneField[] = [];
 
     public constructor(incomingObject: Structured) {
         if (typeof incomingObject !== `object`) {
@@ -25,15 +25,15 @@ export default class StructuredObject {
         try {
             json = JSON.parse(JSON.stringify(incomingObject));
         } catch (e) {
-            throw new Error(`StructuredObject constructor receive a valid JSON object`);
+            throw new Error(`StructuredObject constructor received non-valid JSON object [${e}]`);
         }
 
         const addToFields = (data: Structured, path: string[]) => {
-            let hasOwnProperties = false;
+            let hasAtLeastOwnProperty = false;
 
             for (let propName in data) {
                 if (data.hasOwnProperty(propName)) {
-                    hasOwnProperties = true;
+                    hasAtLeastOwnProperty = true;
 
                     const val = data[propName];
 
@@ -44,8 +44,8 @@ export default class StructuredObject {
                     if (existField) {
                         const fieldPath = existField.path;
                         throw new Error(`StructuredObject constructor got object with two identical property names ${
-                            fieldPath.length ? `[${fieldPath.join('.')}.${propName}]` : propName
-                            } [${newPath.join('.')}]`)
+                            fieldPath.length ? `[${fieldPath.join('.')}.${propName}]` : `[${propName}]`
+                            } [${newPath.join('.')}]`);
                     }
 
                     if (val === null) {
@@ -66,15 +66,16 @@ export default class StructuredObject {
 
                         addToFields(val, newPath);
                     } else {
-                        throw new Error(`StructuredObject property must be an object or null ` +
-                            `[${newPath.join('.')}], but [${typeof val}][${val}]`);
+                        throw new Error(`StructuredObject property must be an object or null in property [${
+                            newPath.join('.')
+                            }], but got [${typeof val}][${val}]`);
                     }
                 }
             }
 
-            if (!hasOwnProperties) {
-                throw new Error(`StructuredObject must have at least one property ${
-                    path.length ? `[${path.join('.')}]` : ``
+            if (!hasAtLeastOwnProperty) {
+                throw new Error(`StructuredObject must have at least one property${
+                    path.length ? ` in property [${path.join('.')}]` : ``
                     }`);
             }
         };
@@ -99,42 +100,3 @@ export default class StructuredObject {
         return {};
     }
 }
-
-// throw new Error(`Cannot find field [${fieldName}] in StructuredObject`)
-
-// const untipedStructuredObject: any = StructuredObject;
-
-// StructuredObject must have at least one property
-// console.log(new StructuredObject({}));
-
-// StructuredObject must have at least one property [nanana]
-// console.log(new StructuredObject({nanana: {}}));
-
-// StructuredObject property must be an object or null [nanana], but [number][123]
-// console.log(new untipedStructuredObject({nanana: 123}));
-
-// StructuredObject constructor got object with two identical property names nanana [nanana.nanana]
-// console.log(new untipedStructuredObject({nanana: {nanana: null}}));
-
-// StructuredObject constructor got object with two identical property names [ururu.lalala.nanana] [ururu.tututu.nanana]
-// console.log(new StructuredObject({ururu: {
-//     lalala: {nanana: null},
-//     tututu: {nanana: null}
-// }}));
-
-// StructuredObject constructor receive an object, but [number][123]
-// console.log(new untipedStructuredObject(123));
-
-// StructuredObject constructor receive a valid JSON object
-// const obj: Structured = {};
-// obj['obj'] = obj;
-// console.log(new StructuredObject(obj));
-
-console.log(new StructuredObject({
-    ururu: {
-        tututu: {
-            lalala: null
-        }
-    },
-    ololo: null
-}));
