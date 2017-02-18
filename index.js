@@ -16,33 +16,36 @@ var StructuredObject = (function () {
             throw new Error("StructuredObject constructor received non-valid JSON object [" + e + "]");
         }
         var addToFields = function (data, path) {
+            var isHashProperty = false;
             var hasAtLeastOwnProperty = false;
-            for (var propName in data) {
-                if (data.hasOwnProperty(propName)) {
+            for (var propertyName in data) {
+                if (data.hasOwnProperty(propertyName)) {
                     hasAtLeastOwnProperty = true;
-                    var val = data[propName];
+                    var val = data[propertyName];
                     var newPath = path.slice();
-                    newPath.push(propName);
-                    var existField = _this.getByFieldName(propName);
+                    newPath.push(propertyName);
+                    var existField = _this.getFieldByName(propertyName);
                     if (existField) {
                         var fieldPath = existField.path;
-                        throw new Error("StructuredObject constructor got object with two identical property names " + (fieldPath.length ? "[" + fieldPath.join('.') + "." + propName + "]" : "[" + propName + "]") + " [" + newPath.join('.') + "]");
+                        throw new Error("StructuredObject constructor got object with two identical property names " + (fieldPath.length ? "[" + fieldPath.join('.') + "." + propertyName + "]" : "[" + propertyName + "]") + " [" + newPath.join('.') + "]");
                     }
                     if (val === null) {
                         _this.fields.push({
-                            fieldName: propName,
+                            fieldName: propertyName,
                             isDataField: true,
                             path: path.slice(),
-                            propName: propName,
+                            propertyName: propertyName,
+                            isHashProperty: isHashProperty,
                             data: null
                         });
                     }
                     else if (typeof val === 'object') {
                         _this.fields.push({
-                            fieldName: propName,
+                            fieldName: propertyName,
                             isDataField: false,
                             path: path.slice(),
-                            propName: propName
+                            propertyName: propertyName,
+                            isHashProperty: isHashProperty
                         });
                         addToFields(val, newPath);
                     }
@@ -57,7 +60,40 @@ var StructuredObject = (function () {
         };
         addToFields(json, []);
     }
-    StructuredObject.prototype.getByFieldName = function (fieldName) {
+    StructuredObject.prototype.getName = function (fieldName) {
+        var field = this.getFieldByName(String(fieldName));
+        if (field) {
+            return field.propertyName;
+        }
+        else {
+            return undefined;
+        }
+    };
+    // If property isn't in StructuredObject instance, property gets into a hash,
+    // it's name and data will be available in .getName() and .getData() methods,
+    // but isn't available in .toJSON() method
+    StructuredObject.prototype.setName = function (fieldName, propertyName) {
+        var isFieldNameString = typeof fieldName !== 'string';
+        if (typeof fieldName !== 'string' || typeof propertyName !== 'string') {
+            throw new Error("StructuredObject.prototype.setPropertyName(" + fieldName + ", " + propertyName + ") " +
+                ("received non-string value in " + (isFieldNameString ? 'first' : 'second') + " param"));
+        }
+        var field = this.getFieldByName(fieldName);
+        if (field) {
+            field.propertyName = propertyName;
+        }
+        else {
+            this.fields.push({
+                fieldName: fieldName,
+                isDataField: true,
+                path: [],
+                propertyName: propertyName,
+                isHashProperty: true,
+                data: null
+            });
+        }
+    };
+    StructuredObject.prototype.getFieldByName = function (fieldName) {
         var fields = this.fields;
         for (var key in fields) {
             if (fields.hasOwnProperty(key)) {
@@ -69,9 +105,7 @@ var StructuredObject = (function () {
         }
         return undefined;
     };
-    StructuredObject.prototype.toJSON = function () {
-        return {};
-    };
     return StructuredObject;
 }());
-exports.StructuredObject = StructuredObject;
+exports.__esModule = true;
+exports["default"] = StructuredObject;
