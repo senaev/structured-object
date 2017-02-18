@@ -1,3 +1,4 @@
 npm-debug.log
 *.iml
 node_modules/
+index.spec.js

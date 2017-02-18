@@ -3,20 +3,22 @@ type Structured = {
 };
 
 type OneField = {
+    fieldName: string;
     isDataField: boolean;
     path: string[];
     propName: string;
     data?: any;
 };
 
+const undefined = void 0;
+
 export default class StructuredObject {
-    private readonly fields: {
-        [fieldName: string]: OneField;
-    } = {};
+    private readonly fields: OneField[];
 
     public constructor(incomingObject: Structured) {
         if (typeof incomingObject !== `object`) {
-            throw new Error(`StructuredObject constructor receive an object, but [${typeof incomingObject}][${incomingObject}]`);
+            throw new Error(`StructuredObject constructor receive an object, but ` +
+                `[${typeof incomingObject}][${incomingObject}]`);
         }
 
         let json: Structured;
@@ -38,26 +40,29 @@ export default class StructuredObject {
                     const newPath = path.slice();
                     newPath.push(propName);
 
-                    if (this.fields.hasOwnProperty(propName)) {
-                        const fieldPath = this.fields[propName].path;
+                    const existField = this.getByFieldName(propName);
+                    if (existField) {
+                        const fieldPath = existField.path;
                         throw new Error(`StructuredObject constructor got object with two identical property names ${
                             fieldPath.length ? `[${fieldPath.join('.')}.${propName}]` : propName
                             } [${newPath.join('.')}]`)
                     }
 
                     if (val === null) {
-                        this.fields[propName] = {
+                        this.fields.push({
+                            fieldName: propName,
                             isDataField: true,
                             path: path.slice(),
                             propName,
                             data: null
-                        };
-                    } else if (typeof val === `object`) {
-                        this.fields[propName] = {
+                        });
+                    } else if (typeof val === 'object') {
+                        this.fields.push({
+                            fieldName: propName,
                             isDataField: false,
                             path: path.slice(),
                             propName
-                        };
+                        });
 
                         addToFields(val, newPath);
                     } else {
@@ -76,10 +81,26 @@ export default class StructuredObject {
         addToFields(json, []);
     }
 
+    protected getByFieldName(fieldName: string): OneField | undefined {
+        const {fields} = this;
+        for (let key in fields) {
+            if (fields.hasOwnProperty(key)) {
+                const field = fields[key];
+                if (field.fieldName === fieldName) {
+                    return field;
+                }
+            }
+        }
+
+        return undefined;
+    }
+
     public toJSON(): Structured {
         return {};
     }
 }
+
+// throw new Error(`Cannot find field [${fieldName}] in StructuredObject`)
 
 // const untipedStructuredObject: any = StructuredObject;
 
