@@ -1,6 +1,6 @@
 import {expect} from 'chai';
 
-import {Structured, default as StructuredObject} from './index';
+import {Structured, StructuredObject} from './index';
 
 describe('StructuredObject', () => {
     describe('.constructor()', () => {
@@ -136,8 +136,6 @@ describe('StructuredObject', () => {
                 .to.throw().an('error').property('message')
                 .eql('StructuredObject.prototype.setPropertyName(property1, null) ' +
                     'received non-string value in second param');
-
-            // TODO: что, если на одном уровне появятся для свойства с одним именем?
         });
 
         it('.setName() and .getName() for non exists in StructuredObject properties', () => {

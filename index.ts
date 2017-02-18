@@ -13,7 +13,7 @@ export type Structured = {
     [propertyName: string]: Structured | null;
 };
 
-export default class StructuredObject {
+export class StructuredObject {
     private readonly fields: OneField[] = [];
 
     public constructor(incomingObject: Structured) {

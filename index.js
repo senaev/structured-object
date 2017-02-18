@@ -107,5 +107,4 @@ var StructuredObject = (function () {
     };
     return StructuredObject;
 }());
-exports.__esModule = true;
-exports["default"] = StructuredObject;
+exports.StructuredObject = StructuredObject;
