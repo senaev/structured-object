@@ -1,53 +1,37 @@
 "use strict";
-var undefined = void 0;
+var clone = function (data) { return JSON.parse(JSON.stringify(data)); };
 var StructuredObject = (function () {
-    function StructuredObject(incomingObject) {
+    function StructuredObject() {
+        this.fields = {};
+    }
+    StructuredObject.prototype.serialize = function (incomingObject) {
         var _this = this;
-        this.fields = [];
         if (typeof incomingObject !== "object") {
-            throw new Error("StructuredObject constructor receive an object, but " +
-                ("[" + typeof incomingObject + "][" + incomingObject + "]"));
+            throw new Error("StructuredObject.prototype.serialize(" + incomingObject + ") called on non-object [" + typeof incomingObject + "]");
         }
         var json;
         try {
-            json = JSON.parse(JSON.stringify(incomingObject));
+            json = clone(incomingObject);
         }
         catch (e) {
-            throw new Error("StructuredObject constructor received non-valid JSON object [" + e + "]");
+            throw new Error("StructuredObject.prototype.serialize(" + incomingObject + ") called on non-valid JSON object [" + e + "]");
         }
-        var addToFields = function (data, path) {
-            var isHashProperty = false;
+        var serialize = function (data, path) {
             var hasAtLeastOwnProperty = false;
+            var newObject = {};
             for (var propertyName in data) {
                 if (data.hasOwnProperty(propertyName)) {
                     hasAtLeastOwnProperty = true;
                     var val = data[propertyName];
+                    var field = _this.fields[propertyName];
+                    var newPropertyName = field ? field.propertyName : propertyName;
                     var newPath = path.slice();
                     newPath.push(propertyName);
-                    var existField = _this.getFieldByName(propertyName);
-                    if (existField) {
-                        var fieldPath = existField.path;
-                        throw new Error("StructuredObject constructor got object with two identical property names " + (fieldPath.length ? "[" + fieldPath.join('.') + "." + propertyName + "]" : "[" + propertyName + "]") + " [" + newPath.join('.') + "]");
-                    }
                     if (val === null) {
-                        _this.fields.push({
-                            fieldName: propertyName,
-                            isDataField: true,
-                            path: path.slice(),
-                            propertyName: propertyName,
-                            isHashProperty: isHashProperty,
-                            data: null
-                        });
+                        newObject[newPropertyName] = field ? field.data : null;
                     }
                     else if (typeof val === 'object') {
-                        _this.fields.push({
-                            fieldName: propertyName,
-                            isDataField: false,
-                            path: path.slice(),
-                            propertyName: propertyName,
-                            isHashProperty: isHashProperty
-                        });
-                        addToFields(val, newPath);
+                        newObject[newPropertyName] = serialize(val, newPath);
                     }
                     else {
                         throw new Error("StructuredObject property must be an object or null in property [" + newPath.join('.') + "], but got [" + typeof val + "][" + val + "]");
@@ -57,53 +41,31 @@ var StructuredObject = (function () {
             if (!hasAtLeastOwnProperty) {
                 throw new Error("StructuredObject must have at least one property" + (path.length ? " in property [" + path.join('.') + "]" : ""));
             }
+            return newObject;
         };
-        addToFields(json, []);
-    }
-    StructuredObject.prototype.getName = function (fieldName) {
-        var field = this.getFieldByName(String(fieldName));
-        if (field) {
-            return field.propertyName;
-        }
-        else {
-            return undefined;
-        }
+        return serialize(json, []);
     };
-    // If property isn't in StructuredObject instance, property gets into a hash,
-    // it's name and data will be available in .getName() and .getData() methods,
-    // but isn't available in .toJSON() method
-    StructuredObject.prototype.setName = function (fieldName, propertyName) {
+    StructuredObject.prototype.setField = function (fieldName, propertyName, data) {
+        if (data === void 0) { data = null; }
         var isFieldNameString = typeof fieldName !== 'string';
         if (typeof fieldName !== 'string' || typeof propertyName !== 'string') {
-            throw new Error("StructuredObject.prototype.setPropertyName(" + fieldName + ", " + propertyName + ") " +
-                ("received non-string value in " + (isFieldNameString ? 'first' : 'second') + " param"));
+            throw new Error("StructuredObject.prototype.setField(" + fieldName + ", " + propertyName + ", " + data + ") " +
+                ("called on non-string value in " + (isFieldNameString ? 'first' : 'second') + " param"));
         }
-        var field = this.getFieldByName(fieldName);
-        if (field) {
-            field.propertyName = propertyName;
+        var json;
+        try {
+            json = clone(data);
         }
-        else {
-            this.fields.push({
-                fieldName: fieldName,
-                isDataField: true,
-                path: [],
-                propertyName: propertyName,
-                isHashProperty: true,
-                data: null
-            });
+        catch (e) {
+            throw new Error("StructuredObject.prototype.setField(" + fieldName + ", " + propertyName + ", " + data + ") called on non-valid JSON object [" + e + "] in third param");
         }
+        this.fields[fieldName] = {
+            propertyName: propertyName,
+            data: json
+        };
     };
-    StructuredObject.prototype.getFieldByName = function (fieldName) {
-        var fields = this.fields;
-        for (var key in fields) {
-            if (fields.hasOwnProperty(key)) {
-                var field = fields[key];
-                if (field.fieldName === fieldName) {
-                    return field;
-                }
-            }
-        }
-        return undefined;
+    StructuredObject.prototype.getField = function (fieldName) {
+        return this.fields[fieldName];
     };
     return StructuredObject;
 }());

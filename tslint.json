@@ -52,7 +52,8 @@
     ],
     "variable-name": [
       true,
-      "check-format"
+      "check-format",
+      "allow-pascal-case"
     ],
     "whitespace": [
       true,
@@ -87,7 +88,6 @@
     ],
     "variable-name": [
       true,
-      "ban-keywords",
       "check-format",
       "allow-pascal-case"
     ],
