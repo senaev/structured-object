@@ -1,74 +1,53 @@
 type OneField = {
-    fieldName: string;
-    isDataField: boolean;
-    path: string[];
     propertyName: string;
-    isHashProperty: boolean;
-    data?: any;
+    data: any;
 };
-
-const undefined = void 0;
 
 export type Structured = {
     [propertyName: string]: Structured | null;
 };
 
-export class StructuredObject {
-    private readonly fields: OneField[] = [];
+const clone = (data: any) => JSON.parse(JSON.stringify(data));
 
-    public constructor(incomingObject: Structured) {
+export class StructuredObject {
+    private readonly fields: {
+        [fieldName: string]: OneField;
+    } = {};
+
+    public serialize(incomingObject: Structured) {
         if (typeof incomingObject !== `object`) {
-            throw new Error(`StructuredObject constructor receive an object, but ` +
-                `[${typeof incomingObject}][${incomingObject}]`);
+            throw new Error(`StructuredObject.prototype.serialize(${incomingObject
+                }) called on non-object [${typeof incomingObject}]`);
         }
 
         let json: Structured;
         try {
-            json = JSON.parse(JSON.stringify(incomingObject));
+            json = clone(incomingObject);
         } catch (e) {
-            throw new Error(`StructuredObject constructor received non-valid JSON object [${e}]`);
+            throw new Error(`StructuredObject.prototype.serialize(${incomingObject
+                }) called on non-valid JSON object [${e}]`);
         }
 
-        const addToFields = (data: Structured, path: string[]) => {
-            const isHashProperty = false;
+        const serialize = (data: Structured, path: string[]): Structured => {
             let hasAtLeastOwnProperty = false;
+
+            const newObject: any = {};
 
             for (let propertyName in data) {
                 if (data.hasOwnProperty(propertyName)) {
                     hasAtLeastOwnProperty = true;
 
                     const val = data[propertyName];
+                    const field = this.fields[propertyName];
+                    const newPropertyName = field ? field.propertyName : propertyName;
 
                     const newPath = path.slice();
                     newPath.push(propertyName);
 
-                    const existField = this.getFieldByName(propertyName);
-                    if (existField) {
-                        const fieldPath = existField.path;
-                        throw new Error(`StructuredObject constructor got object with two identical property names ${
-                            fieldPath.length ? `[${fieldPath.join('.')}.${propertyName}]` : `[${propertyName}]`
-                            } [${newPath.join('.')}]`);
-                    }
-
                     if (val === null) {
-                        this.fields.push({
-                            fieldName: propertyName,
-                            isDataField: true,
-                            path: path.slice(),
-                            propertyName,
-                            isHashProperty,
-                            data: null
-                        });
+                        newObject[newPropertyName] = field ? field.data : null;
                     } else if (typeof val === 'object') {
-                        this.fields.push({
-                            fieldName: propertyName,
-                            isDataField: false,
-                            path: path.slice(),
-                            propertyName,
-                            isHashProperty
-                        });
-
-                        addToFields(val, newPath);
+                        newObject[newPropertyName] = serialize(val, newPath);
                     } else {
                         throw new Error(`StructuredObject property must be an object or null in property [${
                             newPath.join('.')
@@ -82,56 +61,35 @@ export class StructuredObject {
                     path.length ? ` in property [${path.join('.')}]` : ``
                     }`);
             }
+
+            return newObject;
         };
-        addToFields(json, []);
+        return serialize(json, []);
     }
 
-    public getName(fieldName: string): string | undefined {
-        const field = this.getFieldByName(String(fieldName));
-        if (field) {
-            return field.propertyName;
-        } else {
-            return undefined;
-        }
-    }
-
-    // If property isn't in StructuredObject instance, property gets into a hash,
-    // it's name and data will be available in .getName() and .getData() methods,
-    // but isn't available in .toJSON() method
-    public setName(fieldName: string, propertyName: string) {
+    public setField(fieldName: string, propertyName: string, data: any = null) {
         const isFieldNameString = typeof fieldName !== 'string';
 
         if (typeof fieldName !== 'string' || typeof propertyName !== 'string') {
-            throw new Error(`StructuredObject.prototype.setPropertyName(${fieldName}, ${propertyName}) ` +
-                `received non-string value in ${isFieldNameString ? 'first' : 'second'} param`);
+            throw new Error(`StructuredObject.prototype.setField(${fieldName}, ${propertyName}, ${data}) ` +
+                `called on non-string value in ${isFieldNameString ? 'first' : 'second'} param`);
         }
 
-        const field = this.getFieldByName(fieldName);
-        if (field) {
-            field.propertyName = propertyName;
-        } else {
-            this.fields.push({
-                fieldName,
-                isDataField: true,
-                path: [],
-                propertyName,
-                isHashProperty: true,
-                data: null
-            });
+        let json: Structured;
+        try {
+            json = clone(data);
+        } catch (e) {
+            throw new Error(`StructuredObject.prototype.setField(${fieldName}, ${propertyName}, ${
+                data}) called on non-valid JSON object [${e}] in third param`);
         }
+
+        this.fields[fieldName] = {
+            propertyName,
+            data: json
+        };
     }
 
-    protected getFieldByName(fieldName: string): OneField | undefined {
-        const {fields} = this;
-        for (let key in fields) {
-            if (fields.hasOwnProperty(key)) {
-                const field = fields[key];
-                if (field.fieldName === fieldName) {
-                    return field;
-                }
-            }
-        }
-
-        return undefined;
+    public getField(fieldName: string): OneField | undefined {
+        return this.fields[fieldName];
     }
 }

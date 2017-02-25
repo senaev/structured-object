@@ -1,148 +1,218 @@
 import {expect} from 'chai';
 
-import {Structured, StructuredObject} from './index';
+import {StructuredObject, Structured} from './index';
+
+const UntypedStructuredObject: any = StructuredObject;
+
+const circularObject: Structured = {};
+circularObject['property'] = circularObject;
 
 describe('StructuredObject', () => {
-    describe('.constructor()', () => {
-        class UntypedStructuredObject extends StructuredObject {
-            constructor(param?: any) {
-                super(param);
-            }
-        }
+    const structuredObject = new StructuredObject();
+    const untypedStructuredObject = new UntypedStructuredObject();
 
-        it('StructuredObject constructor received not object or null', () => {
-            expect(() => new UntypedStructuredObject())
+    describe('.getField() .setField()', () => {
+
+        it('.getField() returns undefined on non-exist fields', () => {
+            expect(untypedStructuredObject.getField()).undefined;
+            expect(untypedStructuredObject.getField(1)).undefined;
+            expect(structuredObject.getField('undefined')).undefined;
+            expect(structuredObject.getField('')).undefined;
+        });
+
+        it('.setField() errors', () => {
+            expect(() => untypedStructuredObject.setField())
                 .to.throw().an('error').property('message')
-                .eql('StructuredObject constructor receive an object, but [undefined][undefined]');
+                .eql('StructuredObject.prototype.setField(undefined, undefined, null) ' +
+                    'called on non-string value in first param');
 
-            expect(() => new UntypedStructuredObject(0))
+            expect(() => untypedStructuredObject.setField(0, 'newName'))
                 .to.throw().an('error').property('message')
-                .eql('StructuredObject constructor receive an object, but [number][0]');
+                .eql('StructuredObject.prototype.setField(0, newName, null) ' +
+                    'called on non-string value in first param');
 
-            expect(() => new UntypedStructuredObject({property: 0}))
+            expect(() => untypedStructuredObject.setField('field', null))
+                .to.throw().an('error').property('message')
+                .eql('StructuredObject.prototype.setField(field, null, null) ' +
+                    'called on non-string value in second param');
+
+            expect(() => structuredObject.setField('field', 'propName', circularObject))
+                .to.throw().an('error').property('message')
+                .contain('StructuredObject.prototype.setField(field, propName, [object Object]) ' +
+                    'called on non-valid JSON object [');
+        });
+
+        it('.setField() .setField() normal behavior', () => {
+            const field = {
+                propertyName: 'propertyName',
+                data: 0
+            };
+
+            structuredObject.setField('fieldName', field.propertyName, field.data);
+            expect(structuredObject.getField('fieldName')).eql(field);
+        });
+    });
+
+
+    describe('.serialize()', () => {
+        it('called on not object or null', () => {
+            expect(() => untypedStructuredObject.serialize())
+                .to.throw().an('error').property('message')
+                .eql('StructuredObject.prototype.serialize(undefined) called on non-object [undefined]');
+
+            expect(() => untypedStructuredObject.serialize(0))
+                .to.throw().an('error').property('message')
+                .eql('StructuredObject.prototype.serialize(0) called on non-object [number]');
+
+            expect(() => untypedStructuredObject.serialize({property: 0}))
                 .to.throw().an('error').property('message')
                 .eql('StructuredObject property must be an object or null in property [property], but got [number][0]');
 
-            expect(() => new UntypedStructuredObject({property: {deepProperty: 'Hello!'}}))
+            expect(() => untypedStructuredObject.serialize({property: {deepProperty: 'Hello!'}}))
                 .to.throw().an('error').property('message')
                 .eql('StructuredObject property must be an object or null in property [property.deepProperty],' +
                     ' but got [string][Hello!]');
         });
 
         it('StructuredObject must have at least one property', () => {
-            expect(() => new StructuredObject({}))
+            expect(() => structuredObject.serialize({}))
                 .to.throw().an('error').property('message')
                 .eql('StructuredObject must have at least one property');
 
-            expect(() => new StructuredObject({property: {}}))
+            expect(() => structuredObject.serialize({property: {}}))
                 .to.throw().an('error').property('message')
                 .equal('StructuredObject must have at least one property in property [property]');
         });
 
-        it('StructuredObject received two identical property names', () => {
-            expect(() => new StructuredObject({
-                property: {
-                    property: null
-                }
-            }))
-                .to.throw().an('error').property('message')
-                .eql('StructuredObject constructor got object with two identical property names ' +
-                    '[property] [property.property]');
+        it('called on non-valid JSON object', () => {
+            const circularObject: Structured = {};
+            circularObject['property'] = circularObject;
 
-            expect(() => new StructuredObject({
-                property1: {
-                    identicalProperty: null
+            expect(() => structuredObject.serialize(circularObject))
+                .to.throw().an('error').property('message')
+                .contain('StructuredObject.prototype.serialize([object Object]) called on non-valid JSON object [');
+        });
+
+        it('normalBehavior', () => {
+            expect(structuredObject.serialize({
+                fieldName: null
+            })).eql({
+                propertyName: 0
+            });
+
+            structuredObject.setField('one', 'ONE', 1);
+            structuredObject.setField('two', 'TWO', 2);
+            structuredObject.setField('three', 'THREE', 3);
+            structuredObject.setField('four', 'FOUR', 4);
+
+
+            expect(structuredObject.serialize({
+                one: null,
+                two: null,
+                three: null,
+                four: null
+            })).eql({
+                ONE: 1,
+                TWO: 2,
+                THREE: 3,
+                FOUR: 4
+            });
+
+
+            expect(structuredObject.serialize({
+                one: null,
+                two: {
+                    one: null
                 },
-                property2: {
-                    property3: {
-                        identicalProperty: {
-                            property4: null
+                three: {
+                    two: {
+                        one: null
+                    }
+                },
+                four: {
+                    three: {
+                        two: {
+                            one: null
+                        }
+                    }
+                },
+                fife: {
+                    four: {
+                        three: {
+                            two: {
+                                one: {
+                                    zero: null
+                                }
+                            }
                         }
                     }
                 }
-            }))
-                .to.throw().an('error').property('message')
-                .eql('StructuredObject constructor got object with two identical property names ' +
-                    '[property1.identicalProperty] [property2.property3.identicalProperty]');
-        });
-
-        it('StructuredObject constructor receive a valid JSON object', () => {
-            const obj: Structured = {};
-            obj['property'] = obj;
-
-            expect(() => new StructuredObject(obj))
-                .to.throw().an('error').property('message')
-                .contain('StructuredObject constructor received non-valid JSON object');
-        });
-
-        it('StructuredObject normal creating', () => {
-            expect(new StructuredObject({property: null})).to.be.instanceOf(StructuredObject);
-            expect(new StructuredObject({
-                property1: {
-                    property2: null,
-                    property3: {
-                        property4: null
+            })).eql({
+                ONE: 1,
+                TWO: {
+                    ONE: 1
+                },
+                THREE: {
+                    TWO: {
+                        ONE: 1
+                    }
+                },
+                FOUR: {
+                    THREE: {
+                        TWO: {
+                            ONE: 1
+                        }
+                    }
+                },
+                fife: {
+                    FOUR: {
+                        THREE: {
+                            TWO: {
+                                ONE: {
+                                    zero: null
+                                }
+                            }
+                        }
                     }
                 }
-            })).to.be.instanceOf(StructuredObject);
+            });
         });
-    });
 
-    describe('.getName() .setName()', () => {
-        const structuredObject = new StructuredObject({
-            property1: {
-                property2: null,
-                property3: {
-                    property4: null
+        it('same property names in one level', () => {
+            const struct = new StructuredObject();
+            struct.setField('firstField', 'property', 1);
+            struct.setField('secondField', 'property', 2);
+
+            expect(struct.serialize({
+                firstField: {
+                    firstField: null,
+                    secondField: null
                 }
-            },
-            property5: {
-                [0]: null,
-                null: null
-            }
-        });
-        const untypedStructuredObject: any = structuredObject;
+            })).eql({
+                property: {
+                    property: 2
+                }
+            });
 
-        it('Not valid properties', () => {
-            expect(untypedStructuredObject.getName()).undefined;
-            expect(untypedStructuredObject.getName(1)).undefined;
-        });
+            expect(struct.serialize({
+                firstField: null,
+                secondField: {
+                    secondField: null
+                }
+            })).eql({
+                property: {
+                    property: 2
+                }
+            });
 
-        it('If property not exists, .getName() returns undefined', () => {
-            expect(structuredObject.getName('undefined')).undefined;
-            expect(structuredObject.getName('')).undefined;
-        });
-
-        it('Properties return its initial name', () => {
-            expect(structuredObject.getName('property1')).eql('property1');
-            expect(structuredObject.getName('property4')).eql('property4');
-            expect(structuredObject.getName('0')).eql('0');
-            expect(untypedStructuredObject.getName(0)).eql('0');
-            expect(untypedStructuredObject.getName(null)).eql('null');
-        });
-
-        it('.setName() errors', () => {
-            expect(() => untypedStructuredObject.setName())
-                .to.throw().an('error').property('message')
-                .eql('StructuredObject.prototype.setPropertyName(undefined, undefined) ' +
-                    'received non-string value in first param');
-
-            expect(() => untypedStructuredObject.setName(0, 'newName'))
-                .to.throw().an('error').property('message')
-                .eql('StructuredObject.prototype.setPropertyName(0, newName) ' +
-                    'received non-string value in first param');
-
-            expect(() => untypedStructuredObject.setName('property1', null))
-                .to.throw().an('error').property('message')
-                .eql('StructuredObject.prototype.setPropertyName(property1, null) ' +
-                    'received non-string value in second param');
-        });
-
-        it('.setName() and .getName() for non exists in StructuredObject properties', () => {
-            expect(() => structuredObject.setName('nonExists', 'newName'))
-                .to.not.throw();
-
-            expect(structuredObject.getName('nonExists')).eql('newName');
+            expect(struct.serialize({
+                secondField: {
+                    secondField: null
+                },
+                firstField: null
+            })).eql({
+                property: 1
+            });
         });
     });
 });
