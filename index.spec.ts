@@ -258,5 +258,60 @@ describe('StructuredObject', () => {
                 }
             });
         });
+
+        it('README.MD', () => {
+            const struct = new StructuredObject();
+
+            struct.setField('firstField', 'FIRST_FIELD', {
+                FIRST_FIELD_PROPERTY: 'FIRST_FIELD_VALUE'
+            });
+            struct.setField('secondField', 'SECOND_FIELD', 2);
+
+            expect(struct.serialize({
+                firstField: null,
+                secondField: null
+            })).eql({
+                FIRST_FIELD: {
+                    FIRST_FIELD_PROPERTY: 'FIRST_FIELD_VALUE'
+                },
+                SECOND_FIELD: 2
+            });
+
+            expect(struct.serialize({
+                firstField: {
+                    firstField: null,
+                    secondField: null,
+                    extraField: null
+                },
+                secondField: {
+                    extraField: {
+                        secondField: null
+                    }
+                }
+            })).eql({
+                FIRST_FIELD: {
+                    FIRST_FIELD: {
+                        FIRST_FIELD_PROPERTY: 'FIRST_FIELD_VALUE'
+                    },
+                    SECOND_FIELD: 2,
+                    extraField: null
+                },
+                SECOND_FIELD: {
+                    extraField: {
+                        SECOND_FIELD: 2
+                    }
+                }
+            });
+
+            expect(struct.getField('secondField')).eql({
+                propertyName: 'SECOND_FIELD',
+                data: 2
+            });
+
+            expect(struct.getField('extraField')).eql({
+                propertyName: 'extraField',
+                data: null
+            });
+        });
     });
 });
