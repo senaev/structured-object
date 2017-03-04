@@ -89,7 +89,15 @@ export class StructuredObject {
         };
     }
 
-    public getField(fieldName: string): OneField | undefined {
-        return this.fields[fieldName];
+    public getField(fieldName: string): OneField {
+        const field = this.fields[fieldName];
+        if (field) {
+            return field;
+        } else {
+            return {
+                propertyName: fieldName,
+                data: null
+            };
+        }
     }
 }

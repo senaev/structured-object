@@ -65,7 +65,16 @@ var StructuredObject = (function () {
         };
     };
     StructuredObject.prototype.getField = function (fieldName) {
-        return this.fields[fieldName];
+        var field = this.fields[fieldName];
+        if (field) {
+            return field;
+        }
+        else {
+            return {
+                propertyName: fieldName,
+                data: null
+            };
+        }
     };
     return StructuredObject;
 }());

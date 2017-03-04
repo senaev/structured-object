@@ -12,12 +12,23 @@ describe('StructuredObject', () => {
     const untypedStructuredObject = new UntypedStructuredObject();
 
     describe('.getField() .setField()', () => {
-
-        it('.getField() returns undefined on non-exist fields', () => {
-            expect(untypedStructuredObject.getField()).undefined;
-            expect(untypedStructuredObject.getField(1)).undefined;
-            expect(structuredObject.getField('undefined')).undefined;
-            expect(structuredObject.getField('')).undefined;
+        it('.getField() returns empty field with the same name on non-exist fields', () => {
+            expect(untypedStructuredObject.getField()).eql({
+                propertyName: undefined,
+                data: null
+            });
+            expect(untypedStructuredObject.getField(1)).eql({
+                propertyName: 1,
+                data: null
+            });
+            expect(structuredObject.getField('undefined')).eql({
+                propertyName: 'undefined',
+                data: null
+            });
+            expect(structuredObject.getField('')).eql({
+                propertyName: '',
+                data: null
+            });
         });
 
         it('.setField() errors', () => {
@@ -52,7 +63,6 @@ describe('StructuredObject', () => {
             expect(structuredObject.getField('fieldName')).eql(field);
         });
     });
-
 
     describe('.serialize()', () => {
         it('called on not object or null', () => {
@@ -212,6 +222,40 @@ describe('StructuredObject', () => {
                 firstField: null
             })).eql({
                 property: 1
+            });
+        });
+
+        it('set object as value', () => {
+            const struct = new StructuredObject();
+
+            struct.setField('firstField', 'FIRST_FIELD', {
+                FIRST_FIELD_PROPERTY: 'FIRST_FIELD_VALUE'
+            });
+            struct.setField('secondField', 'SECOND_FIELD', {
+                SECOND_FIELD_PROPERTY: 'SECOND_FIELD_VALUE'
+            });
+            expect(struct.serialize({
+                firstField: {
+                    firstField: null
+                },
+                secondField: {
+                    firstField: {
+                        secondField: null
+                    }
+                }
+            })).eql({
+                FIRST_FIELD: {
+                    FIRST_FIELD: {
+                        FIRST_FIELD_PROPERTY: 'FIRST_FIELD_VALUE'
+                    }
+                },
+                SECOND_FIELD: {
+                    FIRST_FIELD: {
+                        SECOND_FIELD: {
+                            SECOND_FIELD_PROPERTY: 'SECOND_FIELD_VALUE'
+                        }
+                    }
+                }
             });
         });
     });
