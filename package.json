@@ -1,0 +1,37 @@
+{
+  "name": "structured-object",
+  "version": "1.0.0",
+  "description": "Make object with freezed structure and dynamic property names and values",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run build && mocha index.spec.js index.js",
+    "build": "tsc index.ts",
+    "watch": "mocha-typescript-watch index.spec.js index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/senaev/structured-object.git"
+  },
+  "keywords": [
+    "structured",
+    "object",
+    "dynamic",
+    "properties",
+    "freezed",
+    "data"
+  ],
+  "author": "Andrey Senaev <gsacryfice@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/senaev/structured-object/issues"
+  },
+  "homepage": "https://github.com/senaev/structured-object#readme",
+  "devDependencies": {
+    "@types/chai": "3.4.35",
+    "@types/mocha": "2.2.39",
+    "chai": "3.5.0",
+    "mocha": "3.2.0",
+    "mocha-typescript": "1.0.21",
+    "typescript": "2.1.6"
+  }
+}
