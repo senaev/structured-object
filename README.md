@@ -1,13 +1,13 @@
 # structured-object
 
-Assign dynamyc properties' names and data for object
+## Assign dynamyc properties' names and data for object
 
 ```bash
 $ npm install structured-object
 ```
 
 Assign fields' names and values for object properties.
-Then you can pass JSON object to `.serialize(json)` method and get object with replaced properties' names and data.
+Then you can pass JSON object to `.serialize()` method and get object with replaced properties' names and data.
 Properties with value `null` will be replaced with data from fields.
 
 ```javascript
@@ -69,7 +69,6 @@ struct.serialize({
 ```
 
 It's able to get assigned fields.
-If there is no asked field in the object the empty field will be return with the same name. 
 
 ```javascript
 struct.getField('secondField');
@@ -80,6 +79,9 @@ struct.getField('secondField');
   "data": 2
 }
 ```
+
+If there is no required field in the StructuredObject, `.getField()` returns an empty field with the same name.
+
 ```javascript
 struct.getField('extraField');
 ```
@@ -90,9 +92,10 @@ struct.getField('extraField');
 }
 ```
 
-Note!
+### Note!
 
-Giving the adjacent object properties the same names, the final object will have the last enumerable property.
+If you call `.serialize()` method with the object which has the adjacent properties with the same StructuredObject field
+names, the serialized object will get the last enumerable one.
 
 ```javascript
 struct.setField('firstField', 'SECOND_FIELD', 1);
