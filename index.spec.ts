@@ -312,6 +312,15 @@ describe('StructuredObject', () => {
                 propertyName: 'extraField',
                 data: null
             });
+
+            struct.setField('firstField', 'SECOND_FIELD', 1);
+
+            expect(struct.serialize({
+                firstField: null,
+                secondField: null
+            })).eql({
+                SECOND_FIELD: 2
+            });
         });
     });
 });
