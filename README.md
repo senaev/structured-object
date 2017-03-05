@@ -35,7 +35,7 @@ struct.serialize({
 ```
 
 It's posiible to pass an object with some identical properties. All of them will be replaced.
-If value is not assigned, it will remain unchanged in serialized object.
+If value is not assigned, it remains unchanged in serialized object.
 
 ```javascript
 struct.serialize({
