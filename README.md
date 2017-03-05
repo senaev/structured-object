@@ -1,16 +1,14 @@
 # structured-object
-Определение динамических имён свойств и данных для объекта
+
+Assign dynamyc properties' names and data for object
 
 ```bash
 $ npm install structured-object
 ```
 
-Сначала вы задаёте имена и значения полей, а затем передаёте объект, в котором указанные имена свойств и значения будут
-заменены.
-Можно дублировать свойства.
-Замена значений произойдёт для свойств, значение которых равно `null`.
-Поля, для которых значение не задано, останутся в первоначальном виде.
-Назначать можно только JSON-валидные данные.
+Assign fields' names and values for object properties.
+Then you can pass JSON object to `.serialize(json)` method and get object with replaced properties' names and data.
+Properties with value `null` will be replaced with data from fields.
 
 ```javascript
 var StructuredObject = require('structured-object').StructuredObject;
@@ -35,6 +33,10 @@ struct.serialize({
   "SECOND_FIELD": 2
 }
 ```
+
+It's posiible to pass an object with some identical properties. All of them will be replaced.
+If value is not assigned, it will remain unchanged in serialized object.
+
 ```javascript
 struct.serialize({
     firstField: {
@@ -66,8 +68,9 @@ struct.serialize({
 }
 ```
 
-Можно получить значение полей, уже имеющихся в объекте.
-Если поля с запрашиваемым именем нет в объекте, будет возвращено пустое поле с тем-же именем
+It's able to get assigned fields.
+If there is no asked field in the object the empty field will be return with the same name. 
+
 ```javascript
 struct.getField('secondField');
 ```
@@ -88,5 +91,19 @@ struct.getField('extraField');
 ```
 
 Note!
-Если вы назначаете свойствам объекта, передаваемого в метод `.serialize()` одинаковые имена, в итоговый объект попадёт
-значение из последнего в порядке перечисления.
+
+Giving the adjacent object properties the same names, the final object will have the last enumerable property.
+
+```javascript
+struct.setField('firstField', 'SECOND_FIELD', 1);
+
+struct.serialize({
+    firstField: null,
+    secondField: null
+});
+```
+```json
+{
+  "SECOND_FIELD": 2
+}
+```
