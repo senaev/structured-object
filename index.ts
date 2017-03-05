@@ -29,14 +29,10 @@ export class StructuredObject {
         }
 
         const serialize = (data: Structured, path: string[]): Structured => {
-            let hasAtLeastOwnProperty = false;
-
             const newObject: any = {};
 
             for (let propertyName in data) {
                 if (data.hasOwnProperty(propertyName)) {
-                    hasAtLeastOwnProperty = true;
-
                     const val = data[propertyName];
                     const field = this.fields[propertyName];
                     const newPropertyName = field ? field.propertyName : propertyName;
@@ -54,12 +50,6 @@ export class StructuredObject {
                             }], but got [${typeof val}][${val}]`);
                     }
                 }
-            }
-
-            if (!hasAtLeastOwnProperty) {
-                throw new Error(`StructuredObject must have at least one property${
-                    path.length ? ` in property [${path.join('.')}]` : ``
-                    }`);
             }
 
             return newObject;

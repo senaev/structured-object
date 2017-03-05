@@ -17,11 +17,9 @@ var StructuredObject = (function () {
             throw new Error("StructuredObject.prototype.serialize(" + incomingObject + ") called on non-valid JSON object [" + e + "]");
         }
         var serialize = function (data, path) {
-            var hasAtLeastOwnProperty = false;
             var newObject = {};
             for (var propertyName in data) {
                 if (data.hasOwnProperty(propertyName)) {
-                    hasAtLeastOwnProperty = true;
                     var val = data[propertyName];
                     var field = _this.fields[propertyName];
                     var newPropertyName = field ? field.propertyName : propertyName;
@@ -37,9 +35,6 @@ var StructuredObject = (function () {
                         throw new Error("StructuredObject property must be an object or null in property [" + newPath.join('.') + "], but got [" + typeof val + "][" + val + "]");
                     }
                 }
-            }
-            if (!hasAtLeastOwnProperty) {
-                throw new Error("StructuredObject must have at least one property" + (path.length ? " in property [" + path.join('.') + "]" : ""));
             }
             return newObject;
         };

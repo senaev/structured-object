@@ -84,14 +84,9 @@ describe('StructuredObject', () => {
                     ' but got [string][Hello!]');
         });
 
-        it('StructuredObject must have at least one property', () => {
-            expect(() => structuredObject.serialize({}))
-                .to.throw().an('error').property('message')
-                .eql('StructuredObject must have at least one property');
-
-            expect(() => structuredObject.serialize({property: {}}))
-                .to.throw().an('error').property('message')
-                .equal('StructuredObject must have at least one property in property [property]');
+        it('StructuredObject can be empty', () => {
+            expect(structuredObject.serialize({})).eql({});
+            expect(structuredObject.serialize({fieldName: {}})).eql({propertyName: {}});
         });
 
         it('called on non-valid JSON object', () => {
