@@ -3,24 +3,28 @@ type OneField = {
     data: any;
 };
 
-export type Structured = {
-    [propertyName: string]: Structured | null;
+export type Structured<T extends string> = {
+    [fieldName in T]?: Structured<T> | null;
+};
+
+export type SerializedStructured = {
+    [fieldName: string]: any;
 };
 
 const clone = (data: any) => JSON.parse(JSON.stringify(data));
 
-export class StructuredObject {
+export class StructuredObject<T extends string> {
     private readonly fields: {
-        [fieldName: string]: OneField;
+        [fieldName in T]?: OneField;
     } = {};
 
-    public serialize(incomingObject: Structured) {
+    public serialize(incomingObject: Structured<T>): SerializedStructured {
         if (typeof incomingObject !== `object`) {
             throw new Error(`StructuredObject.prototype.serialize(${incomingObject
                 }) called on non-object [${typeof incomingObject}]`);
         }
 
-        let json: Structured;
+        let json: SerializedStructured;
         try {
             json = clone(incomingObject);
         } catch (e) {
@@ -28,8 +32,8 @@ export class StructuredObject {
                 }) called on non-valid JSON object [${e}]`);
         }
 
-        const serialize = (data: Structured, path: string[]): Structured => {
-            const newObject: any = {};
+        const serialize = (data: SerializedStructured, path: string[]): object => {
+            const newObject: SerializedStructured = {};
 
             for (let propertyName in data) {
                 if (data.hasOwnProperty(propertyName)) {
@@ -65,7 +69,7 @@ export class StructuredObject {
                 `called on non-string value in ${isFieldNameString ? 'first' : 'second'} param`);
         }
 
-        let json: Structured;
+        let json: any;
         try {
             json = clone(data);
         } catch (e) {
