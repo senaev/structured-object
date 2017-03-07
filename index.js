@@ -1,4 +1,5 @@
 "use strict";
+exports.__esModule = true;
 var clone = function (data) { return JSON.parse(JSON.stringify(data)); };
 var StructuredObject = (function () {
     function StructuredObject() {

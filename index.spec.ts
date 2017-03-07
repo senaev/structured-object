@@ -4,11 +4,19 @@ import {StructuredObject, Structured} from './index';
 
 const UntypedStructuredObject: any = StructuredObject;
 
-const circularObject: Structured = {};
+const circularObject: Structured<'property'> = {};
 circularObject['property'] = circularObject;
 
 describe('StructuredObject', () => {
-    const structuredObject = new StructuredObject();
+    type PossibleProperties = 'fieldName'
+        | 'zero'
+        | 'one'
+        | 'two'
+        | 'three'
+        | 'four'
+        | 'fife';
+
+    const structuredObject = new StructuredObject<PossibleProperties>();
     const untypedStructuredObject = new UntypedStructuredObject();
 
     describe('.getField() .setField()', () => {
@@ -90,9 +98,6 @@ describe('StructuredObject', () => {
         });
 
         it('called on non-valid JSON object', () => {
-            const circularObject: Structured = {};
-            circularObject['property'] = circularObject;
-
             expect(() => structuredObject.serialize(circularObject))
                 .to.throw().an('error').property('message')
                 .contain('StructuredObject.prototype.serialize([object Object]) called on non-valid JSON object [');
