@@ -2,6 +2,8 @@
 
 ## Assign dynamyc properties' names and data for object
 
+[![Build Status](https://travis-ci.org/senaev/structured-object.svg?branch=master)](https://travis-ci.org/senaev/structured-object)
+
 ```bash
 $ npm install structured-object
 ```
