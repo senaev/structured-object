@@ -78,7 +78,7 @@ describe('StructuredObject', () => {
                 .to.throw().an('error').property('message')
                 .eql('StructuredObject.prototype.serialize(undefined) called on non-object [undefined]');
 
-            expect(() => untypedStructuredObject.serialize(1))
+            expect(() => untypedStructuredObject.serialize(0))
                 .to.throw().an('error').property('message')
                 .eql('StructuredObject.prototype.serialize(0) called on non-object [number]');
 
