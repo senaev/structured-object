@@ -4,7 +4,7 @@
   "description": "Make object with freezed structure and dynamic property names and values",
   "main": "index.js",
   "scripts": {
-    "test": "npm run build && mocha index.spec.js index.js",
+    "test": "tsc index.ts index.spec.ts && mocha index.spec.js index.js",
     "build": "tsc index.ts",
     "watch": "mocha-typescript-watch index.spec.js index.js"
   },
