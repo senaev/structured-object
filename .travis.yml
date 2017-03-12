@@ -11,6 +11,5 @@ deploy:
   provider: npm
   email: gsacryfice@gmail.com
   api_key: $NPM_TOKEN
-  before_deploy: "npm run build && git add index.js && git commit"
   on:
     branch: master
