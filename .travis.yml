@@ -5,7 +5,7 @@ script: npm run test
 before_install:
     - export DISPLAY=:99.0
     - sh -e /etc/init.d/xvfb start
-before_deploy: "echo 'ready?'"
+before_deploy: "npm run build && git add . && git commit 'deploy'"
 deploy:
   provider: npm
   email: gsacryfice@gmail.com
