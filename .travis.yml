@@ -7,10 +7,10 @@ before_install:
     - sh -e /etc/init.d/xvfb start
 before_script:
     - npm i
+before_deploy: "npm run build && git add index.js"
 deploy:
   provider: npm
   email: gsacryfice@gmail.com
   api_key: $NPM_TOKEN
-  before_deploy: "npm run build && git add index.js && git commit 'up version'"
   on:
     branch: master
