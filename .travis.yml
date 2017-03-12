@@ -7,3 +7,9 @@ before_install:
     - sh -e /etc/init.d/xvfb start
 before_script:
     - npm i
+deploy:
+  provider: npm
+  email: gsacryfice@gmail.com
+  api_key: $NPM_TOKEN
+  on:
+    branch: master
