@@ -24,9 +24,9 @@ export class StructuredObject<T extends string> {
                 }) called on non-object [${typeof incomingObject}]`);
         }
 
-        let json: SerializedStructured;
+        let serialized: SerializedStructured;
         try {
-            json = clone(incomingObject);
+            serialized = clone(incomingObject);
         } catch (e) {
             throw new Error(`StructuredObject.prototype.serialize(${incomingObject
                 }) called on non-valid JSON object [${e}]`);
@@ -58,7 +58,7 @@ export class StructuredObject<T extends string> {
 
             return newObject;
         };
-        return serialize(json, []);
+        return serialize(serialized, []);
     }
 
     public setField(fieldName: string, propertyName: string, data: any = null) {
