@@ -1,6 +1,6 @@
 {
   "name": "structured-object",
-  "version": "1.0.8",
+  "version": "1.0.8npm run build && git add . && git commit 'deploy'",
   "description": "Make object with freezed structure and dynamic property names and values",
   "main": "index.js",
   "scripts": {
