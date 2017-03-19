@@ -1,6 +1,6 @@
 {
   "name": "structured-object",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "Make object with freezed structure and dynamic property names and values",
   "main": "index.js",
   "scripts": {
