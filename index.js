@@ -10,9 +10,9 @@ var StructuredObject = (function () {
         if (typeof incomingObject !== "object") {
             throw new Error("StructuredObject.prototype.serialize(" + incomingObject + ") called on non-object [" + typeof incomingObject + "]");
         }
-        var json;
+        var serialized;
         try {
-            json = clone(incomingObject);
+            serialized = clone(incomingObject);
         }
         catch (e) {
             throw new Error("StructuredObject.prototype.serialize(" + incomingObject + ") called on non-valid JSON object [" + e + "]");
@@ -39,7 +39,7 @@ var StructuredObject = (function () {
             }
             return newObject;
         };
-        return serialize(json, []);
+        return serialize(serialized, []);
     };
     StructuredObject.prototype.setField = function (fieldName, propertyName, data) {
         if (data === void 0) { data = null; }
