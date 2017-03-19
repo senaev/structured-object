@@ -3,9 +3,7 @@ node_js:
     - "6.7.0"
 script: npm run test
 before_install:
-  - npm i -g makeshift && makeshift -s @bcoe -r https://registry.npmjs.orgbefore_install:
-  - git config --global user.name "Andrey Senaev"
-  - git config --global user.email "gsacryfice@gmail.com"
+  - git config --global user.name "Andrey Senaev" && git config --global user.email "gsacryfice@gmail.com" && npm i -g makeshift && makeshift -s @bcoe -r https://registry.npmjs.orgbefore_install:
 before_deploy: npm run release
 deploy:
   skip_cleanup: true
