@@ -1,6 +1,6 @@
 {
   "name": "structured-object",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "Make object with freezed structure and dynamic property names and values",
   "main": "index.js",
   "scripts": {
@@ -38,7 +38,8 @@
     "typescript": "2.2.1"
   },
   "files": [
-    "index.js", "index.ts"
+    "index.js",
+    "index.ts"
   ],
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
