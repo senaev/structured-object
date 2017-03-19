@@ -10,4 +10,4 @@ deploy:
   email: gsacryfice@gmail.com
   api_key: $NPM_TOKEN
   on:
-    branch: master
+     tags: true
