@@ -74,4 +74,4 @@ var StructuredObject = (function () {
     };
     return StructuredObject;
 }());
-exports["default"] = StructuredObject;
+exports.StructuredObject = StructuredObject;
