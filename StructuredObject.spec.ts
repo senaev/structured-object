@@ -1,6 +1,6 @@
 import {expect} from 'chai';
 
-import {StructuredObject, Structured} from './index';
+import {StructuredObject, Structured} from './StructuredObject';
 
 const UntypedStructuredObject: any = StructuredObject;
 
