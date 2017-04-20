@@ -2,15 +2,3 @@ language: node_js
 node_js:
     - "6.7.0"
 script: npm run test
-before_install:
-  - npm i -g makeshift && makeshift -s @bcoe -r https://registry.npmjs.org
-  - git config --global user.name "Andrey Senaev"
-  - git config --global user.email "gsacryfice@gmail.com"
-before_deploy: npm run release && git push --follow-tags origin master
-deploy:
-  skip_cleanup: true
-  provider: npm
-  email: gsacryfice@gmail.com
-  api_key: $NPM_TOKEN
-  on:
-     branch: master

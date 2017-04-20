@@ -2,11 +2,11 @@
   "name": "structured-object",
   "version": "1.0.12",
   "description": "Make object with freezed structure and dynamic property names and values",
-  "main": "index.js",
+  "main": "StructuredObject.js",
   "scripts": {
-    "test": "tsc index.ts index.spec.ts && mocha index.spec.js index.js",
-    "build": "tsc index.ts",
-    "watch": "mocha-typescript-watch index.spec.js index.js",
+    "test": "tsc StructuredObject.ts StructuredObject.spec.ts && mocha StructuredObject.spec.js StructuredObject.js",
+    "build": "tsc StructuredObject.ts",
+    "watch": "mocha-typescript-watch StructuredObject.spec.js StructuredObject.js",
     "release": "standard-version"
   },
   "repository": {
